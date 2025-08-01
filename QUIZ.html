@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Objective Quiz</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .question { font-size: 20px; margin-bottom: 10px; }
+    .options label { display: block; margin: 5px 0; }
+    #timer { font-weight: bold; color: red; }
+    #score { font-size: 24px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <div id="quiz-container">
+    <div id="question-number"></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <p>Time left: <span id="timer">5</span> seconds</p>
+    <button onclick="nextQuestion()">Next</button>
+  </div>
+
+  <div id="score" style="display:none;"></div>
+
+  <script>
+    const questions = [
+      {
+        question: "What is the main goal of Explainable AI?",
+        options: ["A. To increase model complexity", "B. To reduce training time", "C. To understand and trust AI decisions", "D. To replace human reasoning"],
+        answer: "C"
+      },
+      {
+        question: "Which method is model-agnostic?",
+        options: ["A. Grad-CAM", "B. LIME", "C. Backpropagation", "D. Batch Normalization"],
+        answer: "B"
+      },
+      {
+        question: "Grad-CAM is specifically used for explaining which type of model'?",
+        options: ["A. Decision trees", "B. Support vector machine", "C. Convolutional neural networks", "D. Naive Bayes"],
+        answer: "C"
+      },
+      {
+        question: "What does Grad-CAM help visualize?",
+        options: ["A. Input feature importance in tabular data", "B. which neurons are active in each layer", "C. Important regions of an image that influence predictions", "D. The model's training loss over epochs"],
+        answer: "C"
+      },
+      {
+        question: "Which explanation method works with both tree-based models and neural networks",
+        options: ["A. SHAP", "B. Grad-CAM", "C. Backpropagation", "D. Activation maps"],
+        answer: "A"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 15;
+
+    function loadQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById("question-number").innerText = `Question ${currentQuestion + 1} of ${questions.length}`;
+      document.getElementById("question").innerText = q.question;
+      const opts = q.options.map((opt, index) => {
+        const val = opt.charAt(0);
+        return `<label><input type="radio" name="option" value="${val}"> ${opt}</label>`;
+      }).join("");
+      document.getElementById("options").innerHTML = opts;
+      timeLeft = 15;
+      document.getElementById("timer").innerText = timeLeft;
+      clearInterval(timer);
+      timer = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      timeLeft--;
+      document.getElementById("timer").innerText = timeLeft;
+      if (timeLeft === 0) {
+        clearInterval(timer);
+        checkAnswer();
+        nextQuestion();
+      }
+    }
+
+    function checkAnswer() {
+      const selected = document.querySelector('input[name="option"]:checked');
+      if (selected) {
+        if (selected.value === questions[currentQuestion].answer) {
+          score++;
+        }
+      }
+    }
+
+    function nextQuestion() {
+      checkAnswer();
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        endQuiz();
+      }
+    }
+
+    function endQuiz() {
+      clearInterval(timer);
+      document.getElementById("quiz-container").style.display = "none";
+      document.getElementById("score").style.display = "block";
+      document.getElementById("score").innerText = `Your Score: ${score} / ${questions.length}`;
+    }
+
+    // Start the quiz
+    loadQuestion();
+  </script>
+
+</body>
+</html>
